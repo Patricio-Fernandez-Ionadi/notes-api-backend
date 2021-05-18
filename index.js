@@ -549,7 +549,7 @@ app.use((req, res) => {
 	})
 })
 
-const PORT = 3001
+const PORT = process.env.PORT || 3001
 app.listen(PORT, () => {
 	console.log(`Server running on port ${PORT}`)
 })
@@ -561,3 +561,6 @@ app.listen(PORT, () => {
 // cambio de contrato (major): cambio estructural que rompe la compatibilidad con versiones anteriores
 // new Feature (minor): añadido de contenido o funcionalidad
 // patch : reparacion de alguna funcionalidad, no agrega ni cambia funcionalidad
+
+// instalado heroku => heroku create
+// git remote show origin
