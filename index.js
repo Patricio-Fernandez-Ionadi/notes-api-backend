@@ -4,9 +4,31 @@ const Note = require("./models/Note")
 const express = require("express")
 const app = express()
 const cors = require("cors")
+//
+const Sentry = require("@sentry/node")
+const Tracing = require("@sentry/tracing")
 
 app.use(cors())
 app.use(express.json())
+
+Sentry.init({
+	dsn: "https://7124861b11f94094be271644c6c9ed94@o686739.ingest.sentry.io/5772881",
+	integrations: [
+		// enable HTTP calls tracing
+		new Sentry.Integrations.Http({ tracing: true }),
+		// enable Express.js middleware tracing
+		new Tracing.Integrations.Express({ app }),
+	],
+
+	// Set tracesSampleRate to 1.0 to capture 100%
+	// of transactions for performance monitoring.
+	// We recommend adjusting this value in production
+	tracesSampleRate: 1.0,
+})
+
+app.use(Sentry.Handlers.requestHandler())
+// TracingHandler creates a trace for every incoming request
+app.use(Sentry.Handlers.tracingHandler())
 
 app.get("/", (req, res) => {
 	res.send("<h1>Hello home</h1>")
@@ -22,15 +44,14 @@ app.get("/api/notes/:id", (req, res, next) => {
 	const { id } = req.params
 	Note.findById(id)
 		.then((note) => {
-			if (note) {
-				return res.json(note)
-			} else {
-				res.status(404).end()
-			}
+			return note ? res.json(note) : res.status(404).end()
+			// if (note) {
+			// 	return res.json(note)
+			// } else {
+			// 	res.status(404).end()
+			// }
 		})
-		.catch((err) => {
-			next(err)
-		})
+		.catch(next)
 })
 
 app.put("/api/notes/:id", (req, res, next) => {
@@ -53,7 +74,7 @@ app.delete("/api/notes/:id", (req, res, next) => {
 
 	Note.findByIdAndDelete(id)
 		.then(() => res.status(204).end())
-		.catch((err) => next(err))
+		.catch(next)
 })
 
 app.post("/api/notes", (req, res) => {
@@ -77,6 +98,9 @@ app.post("/api/notes", (req, res) => {
 
 	res.status(201).json(newNote)
 })
+
+// The error handler must be before any other error middleware and after all controllers
+app.use(Sentry.Handlers.errorHandler())
 
 // moveremos esto a un archivo externo por ejemplo notFound.js en una carpeta middlewares
 // app.use((req, res, next) => {
