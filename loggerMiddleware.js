@@ -6,5 +6,4 @@ const logger = (req, res, next) => {
 	next()
 }
 
-// para exportar usaremos
 module.exports = logger

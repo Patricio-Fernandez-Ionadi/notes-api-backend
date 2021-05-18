@@ -7,7 +7,6 @@ Content-type: application/json
 }
 
 ###
-# las 3 ### son para separar cada request
 
 POST http://localhost:3001/api/notes 
 Content-type: application/json
