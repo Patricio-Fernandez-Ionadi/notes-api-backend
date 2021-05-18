@@ -1,35 +1,33 @@
 require("dotenv").config()
 require("./mongo")
-const Note = require("./models/Note")
+// base
 const express = require("express")
 const app = express()
+// serv
 const cors = require("cors")
-//
+// Schema
+const Note = require("./models/Note")
+// errors
 const Sentry = require("@sentry/node")
 const Tracing = require("@sentry/tracing")
+const handleErrors = require("./middlewares/handleErrors")
+const notFound = require("./middlewares/notFound")
 
 app.use(cors())
 app.use(express.json())
-
+//
 Sentry.init({
 	dsn: "https://7124861b11f94094be271644c6c9ed94@o686739.ingest.sentry.io/5772881",
 	integrations: [
-		// enable HTTP calls tracing
 		new Sentry.Integrations.Http({ tracing: true }),
-		// enable Express.js middleware tracing
 		new Tracing.Integrations.Express({ app }),
 	],
-
-	// Set tracesSampleRate to 1.0 to capture 100%
-	// of transactions for performance monitoring.
-	// We recommend adjusting this value in production
 	tracesSampleRate: 1.0,
 })
-
 app.use(Sentry.Handlers.requestHandler())
-// TracingHandler creates a trace for every incoming request
 app.use(Sentry.Handlers.tracingHandler())
 
+//
 app.get("/", (req, res) => {
 	res.send("<h1>Hello home</h1>")
 })
@@ -45,11 +43,6 @@ app.get("/api/notes/:id", (req, res, next) => {
 	Note.findById(id)
 		.then((note) => {
 			return note ? res.json(note) : res.status(404).end()
-			// if (note) {
-			// 	return res.json(note)
-			// } else {
-			// 	res.status(404).end()
-			// }
 		})
 		.catch(next)
 })
@@ -99,26 +92,10 @@ app.post("/api/notes", (req, res) => {
 	res.status(201).json(newNote)
 })
 
-// The error handler must be before any other error middleware and after all controllers
 app.use(Sentry.Handlers.errorHandler())
 
-// moveremos esto a un archivo externo por ejemplo notFound.js en una carpeta middlewares
-// app.use((req, res, next) => {
-// 	res.status(404).end()
-// })
-const notFound = require("./middlewares/notFound") // esto deberia importarse arriba
 app.use(notFound)
 
-// entrará a este middleware cuando llegue un error como parametro
-// app.use((err, req, res, next) => {
-// 	console.error(err)
-// 	if (err.name === "CastError") {
-// 		res.status(400).send({ error: "id used is malformed" })
-// 	} else {
-// 		res.status(500).end()
-// 	}
-// })
-const handleErrors = require("./middlewares/handleErrors")
 app.use(handleErrors)
 
 const PORT = process.env.PORT
