@@ -7,7 +7,7 @@ const app = express()
 const cors = require("cors")
 // Schema
 const Note = require("./models/Note")
-// errors
+// error handling
 const Sentry = require("@sentry/node")
 const Tracing = require("@sentry/tracing")
 const handleErrors = require("./middlewares/handleErrors")
@@ -95,6 +95,8 @@ app.use(notFound)
 app.use(handleErrors)
 
 const PORT = process.env.PORT
-app.listen(PORT, () => {
+const server = app.listen(PORT, () => {
 	console.log(`Server running on port ${PORT}`)
 })
+
+module.exports = { app, server }

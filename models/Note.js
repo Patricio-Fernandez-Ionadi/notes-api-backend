@@ -6,11 +6,9 @@ const noteSchema = new Schema({
 	important: Boolean,
 })
 
-// cambiamos el metodo toJSON del Schema para que nos parsee bien la id generada por mongo
 noteSchema.set("toJSON", {
 	transform: (document, returnedObject) => {
 		returnedObject.id = returnedObject._id
-		// el delete normalmente es una mala practica pero en este caso no pasa nada ya que no está mutando el objeto original directamente y lo hace antes de devolverlo
 		delete returnedObject._id
 		delete returnedObject.__v
 	},
