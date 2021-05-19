@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "cross-env NODE_ENV=development nodemon index.js",
     "start": "cross-env NODE_ENV=production node index.js",
-    "test": "cross-env NODE_ENV=test jest --verbose --silent tests/notes.test.js",
+    "test": "cross-env NODE_ENV=test jest --silent --verbose",
     "test:watch": "npm run test -- --watch"
   },
   "author": "",

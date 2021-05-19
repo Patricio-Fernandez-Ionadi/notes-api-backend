@@ -13,6 +13,11 @@ const initialNotes = [
 		important: true,
 		date: new Date(),
 	},
+	{
+		content: "nuevos cambios en initialNotes!",
+		important: true,
+		date: new Date(),
+	},
 ]
 
 const getAllContentFromNotes = async () => {
