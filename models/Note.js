@@ -37,4 +37,5 @@ const Note = model("Note", noteSchema)
 // 	console.log(res)
 // 	mongoose.connection.close()
 // })
+
 module.exports = Note

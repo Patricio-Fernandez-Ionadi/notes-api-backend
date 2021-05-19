@@ -1,4 +1,5 @@
-module.exports = (err, req, res, next) => {
+module.exports = (err, _, res, __) => {
+	// err, req, res, next
 	console.error(err)
 	if (err.name === "CastError") {
 		res.status(400).send({ error: "id used is malformed" })

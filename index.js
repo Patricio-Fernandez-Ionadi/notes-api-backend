@@ -1,6 +1,6 @@
 require("dotenv").config()
 require("./mongo")
-// base
+//  base
 const express = require("express")
 const app = express()
 // serv
