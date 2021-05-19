@@ -30,7 +30,7 @@ test("some note is about js", async () => {
 })
 
 // NOT WORKING
-/* test("a valid note can be added", async () => {
+test("a valid note can be added", async () => {
 	const newNote = {
 		content: "viendo async/await nuevamente XD",
 		imporntant: true,
@@ -39,14 +39,14 @@ test("some note is about js", async () => {
 		.post("/api/notes")
 		.send(newNote)
 		.expect(201)
+		// .expect(200)
 		.expect("Content-Type", /application\/json/)
-
 
 	const { contents, response } = await getAllContentFromNotes()
 
 	expect(response.body).toHaveLength(initialNotes.length + 1)
 	expect(contents).toContain(newNote.content)
-}) */
+})
 
 test("a note without content cant be added", async () => {
 	const newNote = {

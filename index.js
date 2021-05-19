@@ -38,9 +38,22 @@ app.get("/api/notes", (req, res) => {
 	})
 })
 
-app.get("/api/notes/:id", (req, res, next) => {
+/* Refactorizacion en asyc/await */
+// app.get("/api/notes", async (req, res) => {
+// 	const notes = await Note.find({})
+// 	res.json(notes)
+// })
+
+/* app.get("/api/notes/:id", (req, res, next) => {
 	const { id } = req.params
 	Note.findById(id)
+		.then((note) => (note ? res.json(note) : res.status(404).end()))
+		.catch(next)
+}) */
+/* Refactorizacion en async/await */
+app.get("/api/notes/:id", async (req, res, next) => {
+	const { id } = req.params
+	const note = await Note.findById(id)
 		.then((note) => (note ? res.json(note) : res.status(404).end()))
 		.catch(next)
 })
@@ -66,10 +79,10 @@ app.delete("/api/notes/:id", (req, res, next) => {
 		.catch(next)
 })
 
-app.post("/api/notes", (req, res) => {
+app.post("/api/notes", (req, res, next) => {
 	const note = req.body
 
-	if (!note || !note.content) {
+	if (!note.content) {
 		return res.status(400).json({
 			error: "note.content is missing",
 		})
@@ -77,13 +90,17 @@ app.post("/api/notes", (req, res) => {
 
 	const newNote = new Note({
 		content: note.content,
-		important: typeof note.important !== "undefined" ? note.important : false,
-		date: new Date().toISOString(),
+		// important: typeof note.important !== "undefined" ? note.important : false,
+		important: note.important || false,
+		date: new Date(),
 	})
 
-	newNote.save().then((savedNote) => {
-		res.json(savedNote)
-	})
+	newNote
+		.save()
+		.then((savedNote) => {
+			res.json(savedNote)
+		})
+		.catch((err) => next(err))
 
 	res.status(201).json(newNote)
 })
