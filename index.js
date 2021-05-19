@@ -41,9 +41,7 @@ app.get("/api/notes", (req, res) => {
 app.get("/api/notes/:id", (req, res, next) => {
 	const { id } = req.params
 	Note.findById(id)
-		.then((note) => {
-			return note ? res.json(note) : res.status(404).end()
-		})
+		.then((note) => (note ? res.json(note) : res.status(404).end()))
 		.catch(next)
 })
 
@@ -55,8 +53,6 @@ app.put("/api/notes/:id", (req, res, next) => {
 		content: note.content,
 		important: note.important,
 	}
-	// cuando se usa el metodo findByIdAndUpdate() lo que nos devuelve es lo que ha encontrado por id y no el nuevo contenido actualizado
-	// le pasamos un objeto como tercer parametro con la key 'new' y el value true, y asi nos devolverá el objeto actualizado
 	Note.findByIdAndUpdate(id, newNoteInfo, { new: true }).then((response) => {
 		res.json(response)
 	})
