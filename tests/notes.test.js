@@ -29,7 +29,6 @@ test("some note is about js", async () => {
 	expect(contents).toContain("Aprendiendo fullstack js")
 })
 
-// NOT WORKING
 test("a valid note can be added", async () => {
 	const newNote = {
 		content: "viendo async/await nuevamente XD",
@@ -38,8 +37,8 @@ test("a valid note can be added", async () => {
 	await api
 		.post("/api/notes")
 		.send(newNote)
-		.expect(201)
-		// .expect(200)
+		// .expect(201)
+		.expect(200)
 		.expect("Content-Type", /application\/json/)
 
 	const { contents, response } = await getAllContentFromNotes()
@@ -57,6 +56,29 @@ test("a note without content cant be added", async () => {
 	const response = await api.get("/api/notes")
 	expect(response.body).toHaveLength(initialNotes.length)
 })
+
+test("a note can be deleted", async () => {
+	const { response } = await getAllContentFromNotes()
+	const { body: notes } = response
+	const noteToDelete = notes[0]
+
+	await api.delete(`/api/notes/${noteToDelete.id}`)
+
+	expect(204)
+
+	const { response: secondResponse, contents } = await getAllContentFromNotes()
+
+	expect(secondResponse.body).toHaveLength(initialNotes.length - 1)
+	expect(contents).not.toContain(noteToDelete.content)
+})
+
+/* test("a note that do not exist can not be deleted", async () => {
+	await api.delete(`/api/notes/123454`).expect(400)
+
+	const { response } = await getAllContentFromNotes()
+
+	expect(response.body).toHaveLength(initialNotes.length)
+}) */
 
 afterAll(() => {
 	server.close()

@@ -38,24 +38,15 @@ app.get("/api/notes", (req, res) => {
 	})
 })
 
-/* Refactorizacion en asyc/await */
-// app.get("/api/notes", async (req, res) => {
-// 	const notes = await Note.find({})
-// 	res.json(notes)
-// })
-
-/* app.get("/api/notes/:id", (req, res, next) => {
-	const { id } = req.params
-	Note.findById(id)
-		.then((note) => (note ? res.json(note) : res.status(404).end()))
-		.catch(next)
-}) */
-/* Refactorizacion en async/await */
 app.get("/api/notes/:id", async (req, res, next) => {
 	const { id } = req.params
 	const note = await Note.findById(id)
-		.then((note) => (note ? res.json(note) : res.status(404).end()))
-		.catch(next)
+	try {
+		return res.json(note)
+	} catch (e) {
+		next(e)
+	}
+	res.status(404).end()
 })
 
 app.put("/api/notes/:id", (req, res, next) => {
@@ -71,15 +62,13 @@ app.put("/api/notes/:id", (req, res, next) => {
 	})
 })
 
-app.delete("/api/notes/:id", (req, res, next) => {
+app.delete("/api/notes/:id", async (req, res, next) => {
 	const { id } = req.params
-
-	Note.findByIdAndDelete(id)
-		.then(() => res.status(204).end())
-		.catch(next)
+	await Note.findByIdAndDelete(id)
+	res.status(204).end()
 })
 
-app.post("/api/notes", (req, res, next) => {
+app.post("/api/notes", async (req, res, next) => {
 	const note = req.body
 
 	if (!note.content) {
@@ -95,14 +84,25 @@ app.post("/api/notes", (req, res, next) => {
 		date: new Date(),
 	})
 
-	newNote
+	/* 	newNote
 		.save()
 		.then((savedNote) => {
 			res.json(savedNote)
 		})
-		.catch((err) => next(err))
+		.catch((err) => next(err)) */
+	/* Refactorizacion en async/await */
+	// const savedNote = await newNote.save()
+	// res.json(savedNote)
+	// pero vemos que no estamos manejando el error del catch y esto puede ser un problema
 
-	res.status(201).json(newNote)
+	// intenta
+	try {
+		const savedNote = await newNote.save()
+		res.json(savedNote)
+		// y si no se puede con el error hacer...
+	} catch (err) {
+		next(err)
+	}
 })
 
 app.use(Sentry.Handlers.errorHandler())
