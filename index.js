@@ -1,13 +1,9 @@
 require("dotenv").config()
 require("./mongo")
-//  base
 const express = require("express")
 const app = express()
-// serv
 const cors = require("cors")
-// Schema
 const Note = require("./models/Note")
-// error handling
 const Sentry = require("@sentry/node")
 const Tracing = require("@sentry/tracing")
 const handleErrors = require("./middlewares/handleErrors")
@@ -79,27 +75,13 @@ app.post("/api/notes", async (req, res, next) => {
 
 	const newNote = new Note({
 		content: note.content,
-		// important: typeof note.important !== "undefined" ? note.important : false,
 		important: note.important || false,
 		date: new Date(),
 	})
 
-	/* 	newNote
-		.save()
-		.then((savedNote) => {
-			res.json(savedNote)
-		})
-		.catch((err) => next(err)) */
-	/* Refactorizacion en async/await */
-	// const savedNote = await newNote.save()
-	// res.json(savedNote)
-	// pero vemos que no estamos manejando el error del catch y esto puede ser un problema
-
-	// intenta
 	try {
 		const savedNote = await newNote.save()
 		res.json(savedNote)
-		// y si no se puede con el error hacer...
 	} catch (err) {
 		next(err)
 	}
